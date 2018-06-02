@@ -236,6 +236,11 @@ if (!class_exists('Video')) {
                         $sql .= "1";
                     } else if ($videoFound) {
                         $sql .= "2";
+                    } else {
+                        // Sometimes autodetect fails, so in those cases, 
+                        // default to both Audio and Video. As, not setting this will
+                        // cause the query to error.
+                        $sql .= "0";
                     }
                     $sql .= "' WHERE `category_type_cache`.`categoryId` = ?;";
                     sqlDAL::writeSql($sql,"i",array($catId));
