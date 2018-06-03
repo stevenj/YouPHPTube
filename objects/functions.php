@@ -567,6 +567,14 @@ function getVideosURL($fileName) {
 }
 
 function getSources($fileName, $returnArray = false) {
+    global $global;
+    require_once $global['systemRootPath'] . 'objects/video.php';
+    require_once $global['systemRootPath'] . 'objects/bcp47.php';
+
+    $captypes = array('subs' => 'captions', 
+                      'chap' => 'chapters', 
+                      'desc' => 'descriptions');
+
     $name = "getSources_{$fileName}_" . intval($returnArray);
     /*
       $cached = ObjectYPT::getCache($name, 86400); //one day
@@ -596,10 +604,49 @@ function getSources($fileName, $returnArray = false) {
                 $sourcesArray[] = $obj;
             }
         }
+        error_log ( print_r ($sourcesArray,TRUE) );
         $videoSources = $returnArray ? $sourcesArray : $sources;
     }
     if (function_exists('getVTTTracks')) {
         $subtitleTracks = getVTTTracks($fileName, $returnArray);
+    } else {
+        $files = getVideosURL($fileName);
+
+        /* Find any Subtitle/Chapters or Descriptions that exist for the video file */
+        $subs  = Video::getCaptionFiles($fileName, "subs");
+        $subs  = array_merge($subs, Video::getCaptionFiles($fileName, "chap"));
+        $subs  = array_merge($subs, Video::getCaptionFiles($fileName, "desc"));
+
+        $captions = "";
+        $captionsArray = array();
+        /* For now, the very first track we find becomes the default */
+        $default = array( 'subs' => "default", 'chap' => "default", 'desc' => "" ); 
+
+        error_log ( "TEST 1" );
+
+        /* Process Subtitles/Chapters & Descriptions */
+        foreach ($subs as $key => $value) {
+            /* Extract Language from file name */
+            $matches = array();
+            preg_match('/.([a-z|A-Z]+).([a-z|A-Z]+).vtt$/', $value, $matches);
+            $lang = $matches[2];
+            if (isset($global['bcp47'][$lang])) { $lang = $global['bcp47'][$lang]; }
+            $kind = $matches[1];
+            error_log ( print_r ($kind, TRUE));
+            error_log ( print_r ($default, TRUE));
+
+            $captions .= "<track kind=\"{$captypes[$kind]}\" src=\"{$value}\" srclang=\"{$matches[2]}\" label=\"{$lang}\" {$default[$kind]}></track>\n";
+            $default[$kind] = "";
+
+            $obj = new stdClass();
+            $obj->type = "text/vtt";
+            $obj->src = $value;
+            $captionsArray[] = $obj;
+        }
+        error_log ( print_r ($captionsArray, TRUE));
+        error_log ( print_r ($captions, TRUE));
+
+        $subtitleTracks = $returnArray ? $captionsArray : $captions;
     }
 
     if ($returnArray) {
@@ -607,6 +654,8 @@ function getSources($fileName, $returnArray = false) {
     } else {
         $return = $videoSources . $audioTracks . $subtitleTracks;
     }
+
+    error_log ( print_r ($return, TRUE));
 
     $obj = new stdClass();
     $obj->result = $return;
