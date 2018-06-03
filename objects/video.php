@@ -1554,6 +1554,28 @@ if (!class_exists('Video')) {
             return $source;
         }
 
+        /**
+         * 
+         * @param type $filename
+         * @param type $type = "subs" (sub titles) or "chap" (chapters) or "desc" (descriptions)
+         * @return type array of file names and url's that match this.
+         */
+        static function getCaptionFiles($filename, $type = "subs") {
+            global $global;
+
+            $source = glob ( "{$global['systemRootPath']}videos/{$filename}.{$type}.*.vtt" );
+
+            $captions = array();
+
+            foreach ($source as $fileName) {
+                $captions[$fileName] = str_replace("{$global['systemRootPath']}",
+                                                   "{$global['webSiteRootURL']}",
+                                                   $fileName );
+            }
+
+            return $captions;
+        }
+
         static function getStoragePath() {
             global $global;
             $path = "{$global['systemRootPath']}videos/";
