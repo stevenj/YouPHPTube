@@ -19,6 +19,14 @@ Successfully tagged youphptube:latest
 https://github.com/stevenj/YouPHPTube-Encoder
 
 
+# LOCAL CHANGES
+1. Brute Force subtitles. Manually add a file of the format:\<base file name\>.\<type\>.\<lang\>.vtt <BR>
+    Where: <BR> 
+    \<base file name\> = The file name of the video you want subtitles for, minus its extension. <br>
+    \<type\> = The type of subtitle, either "subs" or "chap" or "desc". <br>
+    \<lang\> = The language code, eg, 'en' = English. <br><br>
+    The player will then find these and automatically make them available.  There is no way currently to add these through the web interface.  They need to be added manually through the file system, and they need to live with your video files.
+
 ### If you are not sure what is YouPHPTube, go to our <a href="https://demo.youphptube.com/" target="_blank">demo</a> page or visit our <a href="https://www.youphptube.com/" target="_blank">official site</a>
 
 # First thing...
