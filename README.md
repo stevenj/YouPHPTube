@@ -27,6 +27,10 @@ https://github.com/stevenj/YouPHPTube-Encoder
     \<lang\> = The language code, eg, 'en' = English. <br><br>
     The player will then find these and automatically make them available.  There is no way currently to add these through the web interface.  They need to be added manually through the file system, and they need to live with your video files.
 
+----------------
+# ORIGINAL README FOLLOWS:
+------------------
+
 ### If you are not sure what is YouPHPTube, go to our <a href="https://demo.youphptube.com/" target="_blank">demo</a> page or visit our <a href="https://www.youphptube.com/" target="_blank">official site</a>
 
 # First thing...
