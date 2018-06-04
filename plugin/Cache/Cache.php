@@ -55,7 +55,8 @@ class Cache extends PluginAbstract {
             if(!empty($_GET['lifetime'])){
                 $lifetime = intval($_GET['lifetime']);
             }            
-            if (file_exists($cachefile) && time() - $lifetime <= filemtime($cachefile)) {
+            // if is a bot always show a cache
+            if (file_exists($cachefile) && (((time() - $lifetime) <= filemtime($cachefile))) || isBot()) {
                 $c = @url_get_contents($cachefile);
                 echo $c;
                 if ($obj->logPageLoadTime) {
@@ -106,9 +107,8 @@ class Cache extends PluginAbstract {
         }else{
             $type = "User: Not Logged - ".$type;            
         }
-        
         $total_time = round(($finish - $global['start']), 4);
-        error_log("Page generated in {$total_time} seconds. {$type} ({$_SERVER['REQUEST_URI']})");
+        error_log("Page generated in {$total_time} seconds. {$type} ({$_SERVER['REQUEST_URI']}) FROM: {$_SERVER['REMOTE_ADDR']} Browser: {$_SERVER['HTTP_USER_AGENT']}");
     }
 
 }
