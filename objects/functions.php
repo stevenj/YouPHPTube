@@ -604,13 +604,14 @@ function getSources($fileName, $returnArray = false) {
                 $sourcesArray[] = $obj;
             }
         }
-        error_log ( print_r ($sourcesArray,TRUE) );
         $videoSources = $returnArray ? $sourcesArray : $sources;
     }
     if (function_exists('getVTTTracks')) {
         $subtitleTracks = getVTTTracks($fileName, $returnArray);
     } else {
-        $files = getVideosURL($fileName);
+        /* Brute Force Subtitles, if the files exist with the video, use them. */
+        /* Currently no way through the web interface to add these files, they */
+        /* need to be added manually. */
 
         /* Find any Subtitle/Chapters or Descriptions that exist for the video file */
         $subs  = Video::getCaptionFiles($fileName, "subs");
@@ -622,8 +623,6 @@ function getSources($fileName, $returnArray = false) {
         /* For now, the very first track we find becomes the default */
         $default = array( 'subs' => "default", 'chap' => "default", 'desc' => "" ); 
 
-        error_log ( "TEST 1" );
-
         /* Process Subtitles/Chapters & Descriptions */
         foreach ($subs as $key => $value) {
             /* Extract Language from file name */
@@ -632,8 +631,6 @@ function getSources($fileName, $returnArray = false) {
             $lang = $matches[2];
             if (isset($global['bcp47'][$lang])) { $lang = $global['bcp47'][$lang]; }
             $kind = $matches[1];
-            error_log ( print_r ($kind, TRUE));
-            error_log ( print_r ($default, TRUE));
 
             $captions .= "<track kind=\"{$captypes[$kind]}\" src=\"{$value}\" srclang=\"{$matches[2]}\" label=\"{$lang}\" {$default[$kind]}></track>\n";
             $default[$kind] = "";
@@ -643,8 +640,6 @@ function getSources($fileName, $returnArray = false) {
             $obj->src = $value;
             $captionsArray[] = $obj;
         }
-        error_log ( print_r ($captionsArray, TRUE));
-        error_log ( print_r ($captions, TRUE));
 
         $subtitleTracks = $returnArray ? $captionsArray : $captions;
     }
@@ -654,8 +649,6 @@ function getSources($fileName, $returnArray = false) {
     } else {
         $return = $videoSources . $audioTracks . $subtitleTracks;
     }
-
-    error_log ( print_r ($return, TRUE));
 
     $obj = new stdClass();
     $obj->result = $return;
